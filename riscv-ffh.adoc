@@ -118,57 +118,158 @@ RISC-V systems.  Refer to the ACPI specification for all remaining fields.
 
 ==== Entry Method
 
-The _LPI object uses a “Resource Descriptor”, which is formatted per the
+The pass:[_]LPI object uses a “Resource Descriptor”, which is formatted per the
 “Generic Register Descriptor” definition ([ACPI 5.0] section 6.4.3.7, also see
-ASL Register in section 19.5.106), to specify the entry method for a lower
+ASL _Register_ in section 19.5.106), to specify the entry method for a lower
 power state.  RISC-V systems set the resource descriptor as specified in
 <<table_lpi_entry_method>>:
 
 [#table_lpi_entry_method]
 .LPI Entry Method
-[cols="1,2", width=70%, align="center", options="header"]
+[cols="^1,^2", width=90%, align="center", options="header"]
 |===
-|  Field                          | Value
+|  Field                           | Value
 
-|  Address Space                  | 0x7F (FFixedHW)
-|  Register Bit Width             | 64
-|  Register Bit Offset            | 0
-|  Access Size                    | 4 (QWord)
-|  Register Address, bits[63:32]  | As specified in the Bits[63:32] column of
-                                    <<lpi_entry_method_address>>
-|  Register Address, bits[31:0]   | As specified in the Bits[31:0] column of
-                                    <<lpi_entry_method_address>>
+|  _Address Space_                 | 0x7F (FFixedHW)
+|  _Register Bit Width_            | 64
+|  _Register Bit Offset_           | 0
+|  _Access Size_                   | 4 (QWord)
+|  _Register Address_, bits[63:32] | As specified in the Bits[63:32] column of
+                                    <<table_lpi_entry_method_address>>
+|  _Register Address_, bits[31:0]  | As specified in the Bits[31:0] column of
+                                    <<table_lpi_entry_method_address>>
 |===
 
 [#table_lpi_entry_method_address]
 .LPI Entry Method Address
-[cols="1,2,2", width=70%, align="center", options="header"]
+[cols="^1,^2,^2", width=90%, align="center", options="header"]
 |===
 |  Bits[63:32]   | Bits[31:0]                | Description
 
 |  0x0000_0001   | 0x0000_0000               | WFI
 |  0x0000_0000   | SBI HSM hart suspend type | Suspend the hart using the
-                   ([SBI HSM hart suspend])    SBI HSM extension
+                                               SBI HSM extension
 |===
 
-All other encodings for LPI entry methods with Address Space set to
-FFixedHW (0x7f) are reserved for future use.
+All other encodings for LPI entry methods with _Address Space_ set to
+_FFixedHW_ (0x7f) are reserved for future use.
 
-RISC-V _LPI objects additionally set the fields in <<lpi_additional_fields>> as
-shown in the table and reserve all other values for those fields for future use.
+RISC-V _LPI objects additionally set the fields in
+<<table_lpi_additional_fields>> as shown in the table and reserve all other
+values for those fields for future use.
 
 [#table_lpi_additional_fields]
 .LPI Additional Fields
-[cols="1,2", width=70%, align="center", options="header"]
+[cols="^1,^2", width=90%, align="center", options="header"]
 |===
 | Field                           | Value
 
-| Arch. Context Lost Flags        | 0
-| Residency Counter Register      | ResourceTemplate(){Register{(SystemMemory,
+| _Arch. Context Lost Flags_      | 0
+| _Residency Counter Register_    | ResourceTemplate(){Register{(SystemMemory,
                                     0, 0, 0, 0)}}
-| Usage Counter Register          | ResourceTemplate(){Register{(SystemMemory,
+| _Usage Counter Register_        | ResourceTemplate(){Register{(SystemMemory,
                                     0, 0, 0, 0)}}
 |===
 
-Appendix TODO provides an example of a WFI entry method and Appendix TODO
-provides an example of an SBI HSM hart suspend entry method.
+<<lpi_examples>> provides examples for both a WFI entry method and an SBI HSM
+hart suspend entry method.
+
+=== Collaborative Processor Performance Control
+
+ACPI describes the Collaborative Processor Performance Control (CPPC)
+mechanism, which is an abstract and flexible mechanism for the operating
+system to collaborate with an entity in the platform to manage the performance
+of the harts.  The platform entity may be the hart itself, the platform
+chipset, or a separate controller.
+
+The ACPI _CPC object provides a way for the operating system to transition the
+hart into a performance state selected from an abstract, continuous range of
+values.  Fields in the _CPC object may be static integers or “Resource
+Descriptors”.  The following subsection specifies a RISC-V system “Resource
+Descriptor” for the _CPC object.
+
+==== _CPC Object Resource Descriptor
+
+The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per the
+“Generic Register Descriptor” definition ([ACPI 5.0] section 6.4.3.7, also see
+ASL _Register_ in section 19.5.106) for many of its fields.  When using a Resource
+Descriptor for a _CPC field, it must be formatted as specified in
+<<table_cpc_resource_descriptor>>:
+
+[#table_cpc_resource_descriptor]
+._CPC Resource Descriptor
+[cols="^1,^2", width=90%, align="center", options="header"]
+|===
+| Field                           | Value
+
+| _Address Space_                 | 0x7F (FFixedHW)
+| _Register Bit Width_            | 64
+| _Register Bit Offset_           | 0
+| _Access Size_                   | 4 (QWord)
+| _Register Address_, bits[63:32] | As specified in the Bits[63:60] and
+                                    Bits[59:32] columns of
+                                    <<table_cpc_register_address>>
+| _Register Address_, bits[31:0]  | As specified in the Bits[31:28],
+                                    Bits[27:16], Bits[15:12], and Bits[11:0]
+                                    columns of <<table_cpc_register_address>>
+|===
+
+[#table_cpc_register_address]
+._CPC Register Address
+[cols="^1,^1,^1,^1,^1,^1,^1", width=100%, align="center", options="header"]
+|===
+| Bits[63:60] +
+  (Type)
+| Bits[59:32] | Bits[31:28] | Bits[27:16] | Bits[15:12] | Bits[11:0] | Description
+| 0x0         | 0x000_0000  | 0x0         | hi CSR +
+                                            number +
+                                             +
+                                            See the +
+                                            note below.
+| 0x0         | lo CSR +
+                number
+| CSR +
+  access
+| 0x1         | 0x000_0000
+4+| SBI CPPC Register ID
+| SBI CPPC +
+  access
+|===
+
+*Note:* Since the access size is 64-bit the runtime needs to compose a 64-bit
+value.  When XLEN=32, and there are two 32-bit registers to compose the 64-bit
+register, hi CSR number is used to access the upper 32 bits and lo CSR number
+is used to access the lower 32 bits.  For systems where XLEN >= 64, the hi CSR
+number is ignored, relying solely on lo CSR number to access the full 64-bit
+value.  A hi CSR number of zero is always ignored, and a lo CSR number value of
+zero is an error.
+
+All other encodings for pass:[_]CPC Resource Descriptors with _Address Space_
+set to _FFixedHW_ (0x7f) are reserved for future use.
+
+<<cppc_examples>> provides examples for both a CSR access and an SBI CPPC
+access.
+
+[appendix]
+[#lpi_examples]
+== LPI Examples
+
+=== WFI Entry Method Example
+
+TODO
+
+=== SBI HSM Hart Suspend Entry Method Example
+
+TODO
+
+[appendix]
+[#cppc_examples]
+== CPPC Examples
+
+=== CSR Access Example
+
+TODO (time and cycle CSRs)
+
+=== SBI CPPC Access Example
+
+TODO
