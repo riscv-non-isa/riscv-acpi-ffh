@@ -1,0 +1,174 @@
+// SPDX-License-Identifier: CC-BY-4.0
+[[header]]
+:description: RISC-V Functional Fixed Hardware Specification
+:company: RISC-V.org
+:revdate: 2/2023
+:revnumber: 0.1
+:revremark: This document is in development. Assume everything can change. See http://riscv.org/spec-state for details.
+:url-riscv: http://riscv.org
+:doctype: book
+:preface-title: Preamble
+:colophon:
+:appendix-caption: Appendix
+:imagesdir: images
+:title-logo-image: image:risc-v_logo.svg[pdfwidth=3.25in,align=center]
+// Settings:
+:experimental:
+:reproducible:
+// needs to be changed? bug discussion started
+//:WaveDromEditorApp: app/wavedrom-editor.app
+:imagesoutdir: images
+:icons: font
+:lang: en
+:listing-caption: Listing
+:sectnums:
+:toc: left
+:toclevels: 4
+:source-highlighter: pygments
+ifdef::backend-pdf[]
+:source-highlighter: coderay
+endif::[]
+:data-uri:
+:hide-uri-scheme:
+:stem: latexmath
+:footnote:
+:xrefstyle: short
+
+= RISC-V Functional Fixed Hardware Specification
+:author: RISC-V Platform Specification Task Group
+:email: tech-prs@lists.riscv.org
+
+// Preamble
+[WARNING]
+.This document is in the link:http://riscv.org/spec-state[Development state]
+====
+Assume everything can change. This draft specification will change before
+being accepted as standard, so implementations made to this draft
+specification will likely not conform to the future standard.
+====
+
+[preface]
+== Copyright and license information
+This specification is licensed under the Creative Commons
+Attribution 4.0 International License (CC-BY 4.0). The full
+license text is available at
+https://creativecommons.org/licenses/by/4.0/.
+
+Copyright 2023 by RISC-V International.
+
+[preface]
+== Change Log
+
+=== Version 0.1
+
+* Initial version
+
+== Introduction
+
+RISC-V systems which use Advanced Configuration and Power Interface (ACPI)
+require additional specifications for some ACPI object fields, typically
+those of type “Resource Descriptor”.  A Functional Fixed Hardware (FFH)
+specification provides those additional specifications.  The use cases
+addressed by this FFH are as follows:
+
+* Lower Power Idle States (LPI), [ACPI 6.0] section 8.4.4
+
+* Collaborative Processor Performance Control (CPPC), [ACPI 5.0] section 8.4.5
+
+=== Terms and Abbreviations
+
+This specification uses the following terms and abbreviations:
+
+[width=80%]
+|===
+| Term  | Meaning
+
+| ACPI  | Advanced Configuration and Power Interface Specification
+| CPC   | Continuous Performance Control
+| CPPC  | Collaborative Processor Performance Control
+| FFH   | Functional Fixed Hardware
+| HSM   | Hart State Management
+| LPI   | Low Power Idle
+| OSPM  | Operating System-directed configuration and Power Management
+| SBI   | Supervisor Binary Interface
+|===
+
+=== References
+
+[width=80%]
+|===
+| Reference  | Description
+
+| [ACPI 5.0] | Advanced Configuration and Power Interface Specification
+               version 5.0
+| [ACPI 6.0] | Advanced Configuration and Power Interface Specification
+               version 6.0
+| [SBI]      | RISC-V Supervisor Binary Interface Specification version 2.0
+|===
+
+== Use Cases
+
+=== Lower Power Idle States
+
+It is desirable for RISC-V system harts to transition to lower power states
+when they go idle.  ACPI provides Lower Power Idle State (_LPI) objects which
+support an operating system’s implementation of transitioning to lower power
+states.  The following subsections specify some fields of the _LPI object for
+RISC-V systems.  Refer to the ACPI specification for all remaining fields.
+
+==== Entry Method
+
+The _LPI object uses a “Resource Descriptor”, which is formatted per the
+“Generic Register Descriptor” definition ([ACPI 5.0] section 6.4.3.7, also see
+ASL Register in section 19.5.106), to specify the entry method for a lower
+power state.  RISC-V systems set the resource descriptor as specified in
+<<table_lpi_entry_method>>:
+
+[#table_lpi_entry_method]
+.LPI Entry Method
+[cols="1,2", width=70%, align="center", options="header"]
+|===
+|  Field                          | Value
+
+|  Address Space                  | 0x7F (FFixedHW)
+|  Register Bit Width             | 64
+|  Register Bit Offset            | 0
+|  Access Size                    | 4 (QWord)
+|  Register Address, bits[63:32]  | As specified in the Bits[63:32] column of
+                                    <<lpi_entry_method_address>>
+|  Register Address, bits[31:0]   | As specified in the Bits[31:0] column of
+                                    <<lpi_entry_method_address>>
+|===
+
+[#table_lpi_entry_method_address]
+.LPI Entry Method Address
+[cols="1,2,2", width=70%, align="center", options="header"]
+|===
+|  Bits[63:32]   | Bits[31:0]                | Description
+
+|  0x0000_0001   | 0x0000_0000               | WFI
+|  0x0000_0000   | SBI HSM hart suspend type | Suspend the hart using the
+                   ([SBI HSM hart suspend])    SBI HSM extension
+|===
+
+All other encodings for LPI entry methods with Address Space set to
+FFixedHW (0x7f) are reserved for future use.
+
+RISC-V _LPI objects additionally set the fields in <<lpi_additional_fields>> as
+shown in the table and reserve all other values for those fields for future use.
+
+[#table_lpi_additional_fields]
+.LPI Additional Fields
+[cols="1,2", width=70%, align="center", options="header"]
+|===
+| Field                           | Value
+
+| Arch. Context Lost Flags        | 0
+| Residency Counter Register      | ResourceTemplate(){Register{(SystemMemory,
+                                    0, 0, 0, 0)}}
+| Usage Counter Register          | ResourceTemplate(){Register{(SystemMemory,
+                                    0, 0, 0, 0)}}
+|===
+
+Appendix TODO provides an example of a WFI entry method and Appendix TODO
+provides an example of an SBI HSM hart suspend entry method.
