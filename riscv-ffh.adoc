@@ -245,7 +245,6 @@ Descriptor for a _CPC field, it must be formatted as specified in
 | Bits[63:60] +
   (Type)
 | Bits[59:32] | Bits[31:12] | Bits[11:0] | Description
-| 0x0 4+| Invalid Encoding
 | 0x1   | 0x000_0000 2+| SBI CPPC Register ID | SBI CPPC access
 | 0x2   | 0x000_0000   | 0x00000 | CSR number | CSR access
 |===
