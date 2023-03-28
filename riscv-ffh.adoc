@@ -71,9 +71,9 @@ those of type “Resource Descriptor”.  A Functional Fixed Hardware (FFH)
 specification provides those additional specifications.  The use cases
 addressed by this FFH are as follows:
 
-* Lower Power Idle States (LPI), [ACPI 6.0] section 8.4.4
+* Lower Power Idle States (LPI), [ACPI 6.5] section 8.4.3
 
-* Collaborative Processor Performance Control (CPPC), [ACPI 5.0] section 8.4.5
+* Collaborative Processor Performance Control (CPPC), [ACPI 6.5] section 8.4.6
 
 === Terms and Abbreviations
 
@@ -99,11 +99,37 @@ This specification uses the following terms and abbreviations:
 |===
 | Reference  | Description
 
-| [ACPI 5.0] | Advanced Configuration and Power Interface Specification
-               version 5.0
-| [ACPI 6.0] | Advanced Configuration and Power Interface Specification
-               version 6.0
+| [ACPI 6.5] | Advanced Configuration and Power Interface Specification
+               version 6.5
 | [SBI]      | RISC-V Supervisor Binary Interface Specification version 2.0
+|===
+
+[#resource_descriptor_encoding]
+== RISC-V FFH Resource Descriptor Encoding
+
+Resource descriptors, which are formatted per the “Generic Register Descriptor”
+definition ([ACPI 6.5] section 6.4.3.7, also see ASL Register in section
+19.6.114), are used by ACPI tables to provide the OSPM read and/or write access
+to platform-specific “registers”.  A resource descriptor may be a fixed value,
+hardware address, function or function parameter identifier, or any other
+encoding of its bits.  While encodings are specific to their applications,
+RISC-V uses a common top-level encoding whenever possible.  That encoding is:
+
+* Register bit width is 64
+
+* The uppermost 4 bits are used to specify the type of identifier represented
+  in the remaining bits.  The possible types are described in table
+  <<table_ffh_resource_descriptor_identifier_type>>
+
+[#table_ffh_resource_descriptor_identifier_type]
+.RISC-V FFH Resource Descriptor Identifier Type
+[cols="^1,^2", width=90%, align="center", options="header"]
+|===
+|  Type          | Description
+
+|  0x0           | None / Other
+|  0x1           | Bits[31:0] represent an SBI identifier
+|  0x2           | Bits[11:0] represent a CSR identifier
 |===
 
 == Use Cases
@@ -118,9 +144,8 @@ RISC-V systems.  Refer to the ACPI specification for all remaining fields.
 
 ==== Entry Method
 
-The pass:[_]LPI object uses a “Resource Descriptor”, which is formatted per the
-“Generic Register Descriptor” definition ([ACPI 5.0] section 6.4.3.7, also see
-ASL _Register_ in section 19.5.106), to specify the entry method for a lower
+The pass:[_]LPI object uses a “Resource Descriptor”, which is formatted per
+<<resource_descriptor_encoding>>, to specify the entry method for a lower
 power state.  RISC-V systems set the resource descriptor as specified in
 <<table_lpi_entry_method>>:
 
@@ -134,21 +159,23 @@ power state.  RISC-V systems set the resource descriptor as specified in
 |  _Register Bit Width_            | 64
 |  _Register Bit Offset_           | 0
 |  _Access Size_                   | 4 (QWord)
-|  _Register Address_, bits[63:32] | As specified in the Bits[63:32] column of
-                                    <<table_lpi_entry_method_address>>
-|  _Register Address_, bits[31:0]  | As specified in the Bits[31:0] column of
+|  _Register Address_              | As specified in the Bits[63:60],
+                                     Bits[59:32], and Bits[31:0] columns of
                                     <<table_lpi_entry_method_address>>
 |===
 
 [#table_lpi_entry_method_address]
 .LPI Entry Method Address
-[cols="^1,^2,^2", width=90%, align="center", options="header"]
+[cols="^1,^2,^2,^2", width=90%, align="center", options="header"]
 |===
-|  Bits[63:32]   | Bits[31:0]                | Description
-
-|  0x0000_0001   | 0x0000_0000               | WFI
-|  0x0000_0000   | SBI HSM hart suspend type | Suspend the hart using the
-                                               SBI HSM extension
+|  Bits[63:60] +
+   (Type)
+| Bits[59:32] | Bits[31:0] | Description
+|  0x0 | 0x000_0000  | 0x0000_0000    | WFI
+|  0x1 | 0x000_0000  | SBI HSM hart +
+                       suspend type
+| Suspend the hart using +
+  the SBI HSM extension
 |===
 
 All other encodings for LPI entry methods with _Address Space_ set to
@@ -165,14 +192,14 @@ values for those fields for future use.
 | Field                           | Value
 
 | _Arch. Context Lost Flags_      | 0
-| _Residency Counter Register_    | ResourceTemplate(){Register{(SystemMemory,
-                                    0, 0, 0, 0)}}
-| _Usage Counter Register_        | ResourceTemplate(){Register{(SystemMemory,
-                                    0, 0, 0, 0)}}
+| _Residency Counter Register_    | ResourceTemplate(){Register(SystemMemory,
+                                    0, 0, 0, 0)}
+| _Usage Counter Register_        | ResourceTemplate(){Register(SystemMemory,
+                                    0, 0, 0, 0)}
 |===
 
-<<lpi_examples>> provides examples for both a WFI entry method and an SBI HSM
-hart suspend entry method.
+<<lpi_examples>> provides examples for both a WFI entry method and SBI HSM
+hart suspend entry methods.
 
 === Collaborative Processor Performance Control
 
@@ -190,9 +217,8 @@ Descriptor” for the _CPC object.
 
 ==== _CPC Object Resource Descriptor
 
-The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per the
-“Generic Register Descriptor” definition ([ACPI 5.0] section 6.4.3.7, also see
-ASL _Register_ in section 19.5.106) for many of its fields.  When using a Resource
+The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per
+<<resource_descriptor_encoding>>, for many of its fields.  When using a Resource
 Descriptor for a _CPC field, it must be formatted as specified in
 <<table_cpc_resource_descriptor>>:
 
@@ -206,43 +232,23 @@ Descriptor for a _CPC field, it must be formatted as specified in
 | _Register Bit Width_            | 64
 | _Register Bit Offset_           | 0
 | _Access Size_                   | 4 (QWord)
-| _Register Address_, bits[63:32] | As specified in the Bits[63:60] and
-                                    Bits[59:32] columns of
+| _Register Address_              | As specified in the Bits[63:60],
+                                    Bits[59:32], Bits[31:12] and
+                                    Bits[11:0] columns of
                                     <<table_cpc_register_address>>
-| _Register Address_, bits[31:0]  | As specified in the Bits[31:28],
-                                    Bits[27:16], Bits[15:12], and Bits[11:0]
-                                    columns of <<table_cpc_register_address>>
 |===
 
 [#table_cpc_register_address]
 ._CPC Register Address
-[cols="^1,^1,^1,^1,^1,^1,^1", width=100%, align="center", options="header"]
+[cols="^1,^1,^1,^1,^1", width=100%, align="center", options="header"]
 |===
 | Bits[63:60] +
   (Type)
-| Bits[59:32] | Bits[31:28] | Bits[27:16] | Bits[15:12] | Bits[11:0] | Description
-| 0x0         | 0x000_0000  | 0x0         | hi CSR +
-                                            number +
-                                             +
-                                            See the +
-                                            note below.
-| 0x0         | lo CSR +
-                number
-| CSR +
-  access
-| 0x1         | 0x000_0000
-4+| SBI CPPC Register ID
-| SBI CPPC +
-  access
+| Bits[59:32] | Bits[31:12] | Bits[11:0] | Description
+| 0x0 4+| Invalid Encoding
+| 0x1   | 0x000_0000 2+| SBI CPPC Register ID | SBI CPPC access
+| 0x2   | 0x000_0000   | 0x00000 | CSR number | CSR access
 |===
-
-*Note:* Since the access size is 64-bit the runtime needs to compose a 64-bit
-value.  When XLEN=32, and there are two 32-bit registers to compose the 64-bit
-register, hi CSR number is used to access the upper 32 bits and lo CSR number
-is used to access the lower 32 bits.  For systems where XLEN >= 64, the hi CSR
-number is ignored, relying solely on lo CSR number to access the full 64-bit
-value.  A hi CSR number of zero is always ignored, and a lo CSR number value of
-zero is an error.
 
 All other encodings for pass:[_]CPC Resource Descriptors with _Address Space_
 set to _FFixedHW_ (0x7f) are reserved for future use.
@@ -252,24 +258,182 @@ access.
 
 [appendix]
 [#lpi_examples]
-== LPI Examples
+== _LPI Object Examples
+[source, C]
+----
+Device (C000) {              // HART0
+    Name (_HID, “ACPI0007”)
+    Name (_LPI,
+        Package () {
+            0,               // Revision
+            0,               // LevelID
+            3,               // Count
 
-=== WFI Entry Method Example
+            // LPI1
+            Package () {
+                1,           // Min Residency (us)
+                1,           // Worst case wakeup latency (us)
+                1,           // Flags
+                0,           // Arch. Context Lost Flags
+                100,         // Residency Counter Frequency
+                0,           // Enabled Parent State
+                ResourceTemplate () {
+                             // Entry Method
+                    Register(FFixedHW, 64, 0,
+                             0x0000_0000_0000_0000,
+                             QWord)
+                },
+                ResourceTemplate () {
+                             // Residency Counter Register
+                    Register(SystemMemory, 0, 0, 0, 0)  // NULL
+                },
+                ResourceTemplate () {
+                             // Usage Counter Register
+                    Register(SystemMemory, 0, 0, 0, 0)  // NULL
+                },
+                             // State Name
+                “RISC-V WFI”
+            },
 
-TODO
+            // LPI2
+            Package () {
+                10,          // Min Residency (us)
+                10,          // Worst case wakeup latency (us)
+                1,           // Flags
+                0,           // Arch. Context Lost Flags
+                100,         // Residency Counter Frequency
+                1,           // Enabled Parent State
+                ResourceTemplate () {
+                             // Entry Method
+                    Register(FFixedHW, 64, 0,
+                             0x1000_0000_0000_0000,
+                             QWord)
+                },
+                ResourceTemplate () {
+                             // Residency Counter Register
+                    Register(SystemMemory, 0, 0, 0, 0)  // NULL
+                },
+                ResourceTemplate () {
+                             // Usage Counter Register
+                    Register(SystemMemory, 0, 0, 0, 0)  // NULL
+                },
+                             // State Name
+                “RISC-V RET_DEFAULT”
+            },
 
-=== SBI HSM Hart Suspend Entry Method Example
-
-TODO
+            // LPI3
+            Package () {
+                3500,        // Min Residency (us)
+                100,         // Worst case wakeup latency (us)
+                1,           // Flags
+                0,           // Arch. Context Lost Flags
+                100,         // Residency Counter Frequency
+                1,           // Enabled Parent State
+                ResourceTemplate () {
+                             // Entry Method
+                    Register(FFixedHW, 64, 0,
+                             0x1000_0000_8000_0000,
+                             QWord)
+                },
+                ResourceTemplate () {
+                             // Residency Counter Register
+                    Register(SystemMemory, 0, 0, 0, 0)  // NULL
+                },
+                ResourceTemplate () {
+                             // Usage Counter Register
+                    Register(SystemMemory, 0, 0, 0, 0)  // NULL
+                },
+                             // State Name
+                “RISC-V NONRET_DEFAULT”
+            }
+        }
+    )
+}
+----
 
 [appendix]
 [#cppc_examples]
-== CPPC Examples
-
-=== CSR Access Example
-
-TODO (time and cycle CSRs)
-
-=== SBI CPPC Access Example
-
-TODO
+== _CPC Object Examples
+[source, C]
+----
+Device (C000) {              // HART0
+    Name (_HID, “ACPI0007”)
+    Name (_CPC,
+        Package () {
+            23,              // NumEntries
+            3,               // Revision
+            120,             // Highest Performance
+            100,             // Nominal Performance
+            40,              // Lowest Nonlinear Performance
+            20,              // Lowest Performance
+            ResourceTemplate () {
+                             // Guaranteed Performance Register
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // Desired Performance Register
+                Register(FFixedHW, 64, 0,
+                         0x1000_0000_0000_0005,
+                         QWord)
+            },
+            ResourceTemplate () {
+                             // Minimum Performance Register
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // Maximum Performance Register
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // Performance Reduction Tolerance Register
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // Time Window Register
+                Register(FFixedHW, 64, 0,
+                         0x1000_0000_0000_0009,
+                         QWord)
+            },
+            ResourceTemplate () {
+                             // Counter Wraparound Time
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // Reference Performance Counter Register
+                Register(FFixedHW, 64, 0,
+                         0x2000_0000_0000_0C01,
+                         QWord)
+            },
+            ResourceTemplate () {
+                             // Delivered Performance Counter Register
+                Register(FFixedHW, 64, 0,
+                         0x1000_0000_0000_000C,
+                         QWord)
+            },
+            ResourceTemplate () {
+                             // Performance Limited Register
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // CPPC EnableRegister
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // Autonomous Selection Enable
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // AutonomousActivityWindowRegister
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            ResourceTemplate () {
+                             // EnergyPerformancePreferenceRegister
+                Register(SystemMemory, 0, 0, 0, 0)  // NULL
+            },
+            1,               // Reference Performance
+            40,              // Lowest Frequency
+            100,             // Nominal Frequency
+        }
+    )
+}
+----
