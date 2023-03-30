@@ -425,7 +425,7 @@ Device (C000) {              // HART0
                 Register(SystemMemory, 0, 0, 0, 0)  // NULL
             },
             1,               // Reference Performance
-            40,              // Lowest Frequency
+            20,              // Lowest Frequency
             100,             // Nominal Frequency
         }
     )
