@@ -1,10 +1,9 @@
-= RISC-V docs-spec-template
+= RISC-V Functional Fixed Hardware Specification
 
-This repository is used to prime GitHub repos for the RISC-V organization which will be used
-to create specifications.
-
-**If you are reading this in a specification repo, please update the title for this section and
-provide your introduction to your repository.**
+RISC-V systems which use Advanced Configuration and Power Interface (ACPI)
+require additional specifications for some ACPI object fields, typically
+those of type “Resource Descriptor”.  A Functional Fixed Hardware (FFH)
+specification provides those additional specifications.
 
 = License
 
@@ -12,8 +11,6 @@ This work is licensed under a Creative Commons Attribution 4.0 International Lic
 See the link:LICENSE[LICENSE] file for details.
 
 = Contributors
-
-Contributors to this specification are contained in the link:contributors.adoc[contributors] file.
 
 For instructions on how to contribute please see the link:CONTRIBUTING.md[CONTRIBUTING] file.
 
