@@ -211,8 +211,8 @@ Descriptor” for the _CPC object.
 ==== _CPC Object Resource Descriptor
 
 The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per
-<<resource_descriptor_encoding>>, for many of its fields.  When using a Resource
-Descriptor for a _CPC field, it must be formatted as specified in
+<<resource_descriptor_encoding>>, for many of its fields.  When using an FFH
+Resource Descriptor for a _CPC field, it must be formatted as specified in
 <<table_cpc_resource_descriptor>>:
 
 [#table_cpc_resource_descriptor]
