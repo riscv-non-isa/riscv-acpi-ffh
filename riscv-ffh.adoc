@@ -59,7 +59,7 @@ Copyright 2023 by RISC-V International.
 [preface]
 == Change Log
 
-=== Version 0.1
+=== Version 1.0
 
 * Initial version
 
