@@ -17,6 +17,8 @@ jobs:
     # Checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
 
     # Pull the latest RISC-V Docs container image
     # https://github.com/riscv/riscv-docs-base-container-image
@@ -41,4 +43,4 @@ jobs:
       with:
         name: ${{ env.REPO_NAME }}-${{ env.SHORT_SHA }}.pdf
         path: ${{ github.workspace }}/*.pdf
-        retention-days: 7
+        retention-days: 30
