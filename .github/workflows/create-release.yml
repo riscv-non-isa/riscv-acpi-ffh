@@ -1,7 +1,3 @@
-# This work flow includes source and PDF in Release.  It relies on the build-pdf workflow to create the PDF.
-#
-# NOTE: At this time it only runs manually.
-
 name: Create Document Release
 
 on:
@@ -21,23 +17,41 @@ on:
         required: false
         type: boolean
         default: false
-
 jobs:
   build:
-    uses: ./.github/workflows/build-pdf.yml
-  release:
     runs-on: ubuntu-latest
-    needs: build
+
     steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@v3
+    # Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
       with:
-        name: ${{ needs.build.outputs.pdf-name }}
+        submodules: 'recursive'
+
+    # Pull the latest RISC-V Docs container image
+    # https://github.com/riscv/riscv-docs-base-container-image
+    # https://hub.docker.com/r/riscvintl/riscv-docs-base-container-image
+    - name: Pull Container
+      run: |
+        docker pull riscvintl/riscv-docs-base-container-image:latest
+    # Build PDF file using the container
+    - name: Build Files
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/build riscvintl/riscv-docs-base-container-image:latest \
+        /bin/sh -c 'make'
+    # Set the short SHA and repo name for use in artifact names
+    - name: Set short SHA and repo name
+      run: |
+        echo "SHORT_SHA=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
+        echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY##*/})" >> $GITHUB_ENV
+  
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{ needs.build.outputs.pdf-name }}
+        files: ${{ github.workspace }}/*.pdf
         tag_name: v${{ github.event.inputs.version }}
         name: Release ${{ github.event.inputs.version }}
         draft: ${{ github.event.inputs.draft }}
         prerelease: ${{ github.event.inputs.prerelease }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GHTOKEN }}
