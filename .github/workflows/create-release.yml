@@ -44,6 +44,7 @@ jobs:
       run: |
         echo "SHORT_SHA=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
         echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY##*/})" >> $GITHUB_ENV
+        echo "GITVERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
   
     - name: Create Release
       uses: softprops/action-gh-release@v1
