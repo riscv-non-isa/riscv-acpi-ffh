@@ -23,9 +23,6 @@ all: $(TARGETS)
 	--attribute=mathematical-format=svg \
 	-a toc \
 	-a compress \
-	-a revdate=${COMMITDATE} \
-	-a revnumber=${GITVERSION} \
-	-a revremark=Draft \
 	-a pdf-style=docs-resources/themes/riscv-pdf.yml \
 	-a pdf-fontsdir=docs-resources/fonts \
 	--require=asciidoctor-mathematical \
