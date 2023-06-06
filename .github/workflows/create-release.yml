@@ -34,17 +34,21 @@ jobs:
     - name: Pull Container
       run: |
         docker pull riscvintl/riscv-docs-base-container-image:latest
-    # Build PDF file using the container
+    - name: Pull Container
+      run: |
+        docker pull riscvintl/riscv-docs-base-container-image:latest
+    - name: Set Commit Date and Git Version
+      run: |
+        echo "COMMITDATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+        echo "GITVERSION=v${{ github.event.inputs.version }}" >> $GITHUB_ENV
     - name: Build Files
       run: |
-        docker run --rm -v ${{ github.workspace }}:/build riscvintl/riscv-docs-base-container-image:latest \
-        /bin/sh -c 'make'
-    # Set the short SHA and repo name for use in artifact names
-    - name: Set short SHA and repo name
-      run: |
-        echo "SHORT_SHA=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
-        echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY##*/})" >> $GITHUB_ENV
-        echo "GITVERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          docker run --rm \
+            -v ${{ github.workspace }}:/build \
+            -e GITVERSION \
+            -e COMMITDATE \
+            riscvintl/riscv-docs-base-container-image:latest \
+            /bin/sh -c 'make'
   
     - name: Create Release
       uses: softprops/action-gh-release@v1
