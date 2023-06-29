@@ -190,8 +190,21 @@ power state.  RISC-V systems set the resource descriptor as specified in
 All other encodings for LPI entry methods with _Address Space_ set to
 _FFixedHW_ (0x7f) are reserved for future use.
 
-Additionally, RISC-V pass:[_]LPI objects must set the _Arch. Context Lost Flags_
-field to zero, as all other values for it are reserved for future use.
+==== Arch. Context Lost Flags
+
+pass:[_]LPI objects also provide an _Arch. Context Lost Flags_ field, which is
+a 32-bit integer, and may be used to indicate what processor context is lost.
+RISC-V pass:[_]LPI objects must have appropriate flags set in this field as
+specified in <<table_lpi_arch_context_lost_flags>>:
+
+[#table_lpi_arch_context_lost_flags]
+.LPI Arch. Context Lost Flags
+[cols="^1,^1,^4", width=90%, align="center", options="header"]
+|===
+| Bit offset | Bit width | Description
+| 0          | 1         | Set when the hart timer context is lost.
+| 1          | 31        | Reserved. Must be zero.
+|===
 
 <<lpi_examples>> provides examples for both a WFI entry method and SBI HSM
 hart suspend entry methods.
