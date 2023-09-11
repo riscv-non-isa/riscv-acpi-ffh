@@ -27,6 +27,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: 'recursive'
+        fetch-depth: 0
 
     # Pull the latest RISC-V Docs container image
     # https://github.com/riscv/riscv-docs-base-container-image

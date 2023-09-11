@@ -6,8 +6,9 @@ TARGETS += riscv-ffh.html
 TARGETS += $(REVSNIP)
 COMMITDATE ?= $(shell git show -s --format=%ci | cut -d ' ' -f 1)
 GITVERSION ?= $(shell git describe --tag)
-REVMARK=Draft
 SPEC=$(shell pwd)
+COMMITDATE=$(shell git show -s --format=%ci | cut -d ' ' -f 1)
+GITVERSION=$(shell git describe --tag)
 
 .PHONY: all
 all: $(TARGETS)
@@ -21,7 +22,6 @@ all: $(TARGETS)
 	-a toc \
 	-a compress \
 	-a revnumber=${GITVERSION} \
-	-a revremark=${REVMARK} \
 	-a revdate=${COMMITDATE} \
 	-a pdf-style=docs-resources/themes/riscv-pdf.yml \
 	-a pdf-fontsdir=docs-resources/fonts \
