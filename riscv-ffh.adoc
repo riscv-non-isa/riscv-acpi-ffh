@@ -59,6 +59,9 @@ https://creativecommons.org/licenses/by/4.0/.
 Copyright 2023 by RISC-V International.
 
 [preface]
+include::contributors.adoc[]
+
+[preface]
 == Change Log
 
 === Version 1.0.0
