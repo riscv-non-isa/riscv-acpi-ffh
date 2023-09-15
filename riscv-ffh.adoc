@@ -5,7 +5,7 @@
 // Pull in variable with revision info
 :revnumber: 1234
 :revdate: 2023-01-01
-:revremark: Draft
+:revremark: This document is stable. Assume anything could still change, but limited change should be expected. Visit http://riscv.org/spec-state for further details. 
 :url-riscv: http://riscv.org
 :doctype: book
 :preface-title: Preamble
@@ -57,6 +57,9 @@ license text is available at
 https://creativecommons.org/licenses/by/4.0/.
 
 Copyright 2023 by RISC-V International.
+
+[preface]
+include::contributors.adoc[]
 
 [preface]
 == Change Log

@@ -14,7 +14,6 @@
 
 COMMITDATE ?= $(shell git show -s --format=%ci | cut -d ' ' -f 1)
 GITVERSION ?= $(shell git describe --tag)
-REVMARK=Draft
 
 ifeq ($(strip $(GITVERSION)),)
   GITVERSION := no_tag
@@ -31,7 +30,6 @@ OPTIONS := --trace \
            -a compress \
            -a mathematical-format=svg \
            -a revnumber=${GITVERSION} \
-           -a revremark=${REVMARK} \
            -a revdate=${COMMITDATE} \
            -a pdf-fontsdir=docs-resources/fonts \
            -a pdf-style=docs-resources/themes/riscv-pdf.yml \
