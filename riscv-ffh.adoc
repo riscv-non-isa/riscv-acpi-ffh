@@ -89,6 +89,7 @@ This specification uses the following terms and abbreviations:
 | Term  | Meaning
 
 | ACPI  | Advanced Configuration and Power Interface Specification
+| ASL   | ACPI Source Language
 | CPC   | Continuous Performance Control
 | CPPC  | Collaborative Processor Performance Control
 | FFH   | Functional Fixed Hardware
