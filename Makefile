@@ -19,6 +19,10 @@ ifeq ($(strip $(GITVERSION)),)
   GITVERSION := no_tag
 endif
 
+VERSION ?= ${GITVERSION}
+DATE ?= ${COMMITDATE}
+REVMARK ?= Draft
+
 DOCKER_RUN := docker run --rm -v ${PWD}:/build -w /build \
 riscvintl/riscv-docs-base-container-image:latest
 
@@ -29,8 +33,9 @@ ASCIIDOCTOR_PDF := asciidoctor-pdf
 OPTIONS := --trace \
            -a compress \
            -a mathematical-format=svg \
-           -a revnumber=${GITVERSION} \
-           -a revdate=${COMMITDATE} \
+           -a revnumber=${VERSION} \
+           -a revdate=${DATE} \
+           -a revremark=${REVMARK} \
            -a pdf-fontsdir=docs-resources/fonts \
            -a pdf-style=docs-resources/themes/riscv-pdf.yml \
            --failure-level=ERROR
