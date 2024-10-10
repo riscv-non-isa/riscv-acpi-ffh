@@ -44,7 +44,7 @@ endif::[]
 [WARNING]
 .This document is in the link:http://riscv.org/spec-state[Ratified state]
 ===
-No changes are allowed. Any desired or needed changes can be the subject of a follow-on new extension. Ratified extensions are never revised
+No changes are allowed. Any desired or needed changes can be the subject of a follow-on new extension. Ratified extensions are never revised.
 [preface]
 == Copyright and license information
 This specification is licensed under the Creative Commons
@@ -63,6 +63,10 @@ include::contributors.adoc[]
 === Version 1.0.0
 
 * Initial version
+
+==== Version 1.0.1
+
+* Only print the specification state on the title page, not the entire text.
 
 == Introduction
 
