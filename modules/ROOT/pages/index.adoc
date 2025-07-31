@@ -1,0 +1,3 @@
+= Functional Fixed Hardware
+
+ACPI Functional Fixed Hardware

@@ -1,0 +1,2 @@
+.ACPI Functional Fixed Hardware
+* xref:riscv-ffh.adoc[ACPI Functional Fixed Hardware]
