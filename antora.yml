@@ -1,6 +1,9 @@
 name: ffh
 title: ACPI Functional Fixed Hardware
 version: v1.0
-pdf-url: https://github.com/riscv/docs.riscv.org/blob/main/static/pdf/riscv-ffh.pdf
 nav:
 - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    pdf-url: https://github.com/riscv/docs.riscv.org/blob/main/static/pdf/riscv-ffh.pdf
