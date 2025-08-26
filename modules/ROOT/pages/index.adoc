@@ -1,3 +1,6 @@
-= Functional Fixed Hardware
+image:risc-v_logo.svg[]
 
-ACPI Functional Fixed Hardware
+= RISC-V Functional Fixed Hardware Specification
+
+
+Version v1.0.1, 2024-10-10: Ratified
