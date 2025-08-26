@@ -1,6 +1,6 @@
 image:risc-v_logo.svg[]
 
-= RISC-V Functional Fixed Hardware Specification
+== RISC-V Functional Fixed Hardware Specification
 
 
 Version v1.0.1, 2024-10-10: Ratified
