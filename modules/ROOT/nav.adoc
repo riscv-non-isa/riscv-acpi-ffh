@@ -1,2 +1,4 @@
 .ACPI Functional Fixed Hardware
+* xref:index.adoc[ACPI Functional Fixed Hardware]
+* xref:contributors.adoc[Contributors]
 * xref:riscv-ffh.adoc[ACPI Functional Fixed Hardware]

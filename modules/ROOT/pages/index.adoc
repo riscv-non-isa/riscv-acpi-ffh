@@ -3,4 +3,6 @@ image::risc-v_logo.svg[]
 == RISC-V Functional Fixed Hardware Specification
 
 
+RISC-V Platform Specification Task Group
+
 Version v1.0.1, 2024-10-10: Ratified
