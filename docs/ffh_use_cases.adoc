@@ -1,0 +1,124 @@
+== Use Cases
+
+=== Lower Power Idle States
+
+It is desirable for RISC-V system harts to transition to lower power states
+when they go idle.  ACPI provides Lower Power Idle State (_LPI) objects which
+support an operating system’s implementation of transitioning to lower power
+states.  The following subsections specify some fields of the _LPI object for
+RISC-V systems.  Refer to the ACPI specification for all remaining fields.
+
+==== Entry Method
+
+The pass:[_]LPI object uses a “Resource Descriptor”, which is formatted per
+<<resource_descriptor_encoding>>, to specify the entry method for a lower
+power state.  RISC-V systems set the resource descriptor as specified in
+<<table_lpi_entry_method>>:
+
+[#table_lpi_entry_method]
+.LPI Entry Method
+[cols="^1,^2", width=90%, align="center", options="header"]
+|===
+|  Field                           | Value
+
+|  _Address Space_                 | 0x7F (FFixedHW)
+|  _Register Bit Width_            | 64
+|  _Register Bit Offset_           | 0
+|  _Access Size_                   | 4 (QWord)
+|  _Register Address_              | As specified in the Bits[63:60],
+                                     Bits[59:32], and Bits[31:0] columns of
+                                    <<table_lpi_entry_method_address>>
+|===
+
+[#table_lpi_entry_method_address]
+.LPI Entry Method Address
+[cols="^1,^2,^2,^2", width=90%, align="center", options="header"]
+|===
+|  Bits[63:60] +
+   (Type)
+| Bits[59:32] | Bits[31:0] | Description
+|  0x0 | 0x000_0000  | 0x0000_0000    | WFI
+|  0x1 | 0x000_0000  | SBI HSM hart +
+                       suspend type
+| Suspend the hart using +
+  the SBI HSM extension
+|===
+
+All other encodings for LPI entry methods with _Address Space_ set to
+_FFixedHW_ (0x7f) are reserved for future use.
+
+==== Arch. Context Lost Flags
+
+pass:[_]LPI objects also provide an _Arch. Context Lost Flags_ field, which is
+a 32-bit integer, and may be used to indicate what processor context is lost.
+RISC-V pass:[_]LPI objects must have appropriate flags set in this field as
+specified in <<table_lpi_arch_context_lost_flags>>:
+
+[#table_lpi_arch_context_lost_flags]
+.LPI Arch. Context Lost Flags
+[cols="^1,^1,^4", width=90%, align="center", options="header"]
+|===
+| Bit offset | Bit width | Description
+| 0          | 1         | Set when the hart timer context is lost.
+| 1          | 31        | Reserved. Must be zero.
+|===
+
+<<lpi_examples>> provides examples for both a WFI entry method and SBI HSM
+hart suspend entry methods.
+
+=== Collaborative Processor Performance Control
+
+ACPI describes the Collaborative Processor Performance Control (CPPC)
+mechanism, which is an abstract and flexible mechanism for the operating
+system to collaborate with an entity in the platform to manage the performance
+of the harts.  The platform entity may be the hart itself, the platform
+chipset, or a separate controller.
+
+The ACPI _CPC object provides a way for the operating system to transition the
+hart into a performance state selected from an abstract, continuous range of
+values.  Fields in the _CPC object may be static integers or “Resource
+Descriptors”.  The following subsection specifies a RISC-V system “Resource
+Descriptor” for the _CPC object.
+
+==== _CPC Object Resource Descriptor
+
+The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per
+<<resource_descriptor_encoding>>, for many of its fields.  When using an FFH
+Resource Descriptor for a _CPC field, it must be formatted as specified in
+<<table_cpc_resource_descriptor>>:
+
+[#table_cpc_resource_descriptor]
+._CPC Resource Descriptor
+[cols="^1,^2", width=90%, align="center", options="header"]
+|===
+| Field                           | Value
+
+| _Address Space_                 | 0x7F (FFixedHW)
+| _Register Bit Width_            | 64
+| _Register Bit Offset_           | 0
+| _Access Size_                   | 4 (QWord)
+| _Register Address_              | As specified in the Bits[63:60],
+                                    Bits[59:32], Bits[31:12] and
+                                    Bits[11:0] columns of
+                                    <<table_cpc_register_address>>
+|===
+
+[#table_cpc_register_address]
+._CPC Register Address
+[cols="^1,^1,^1,^1,^1", width=100%, align="center", options="header"]
+|===
+| Bits[63:60] +
+  (Type)
+| Bits[59:32] | Bits[31:12] | Bits[11:0] | Description
+| 0x1   | 0x000_0000 2+| SBI CPPC Register ID | SBI CPPC access
+| 0x2   | 0x000_0000   | 0x00000 | CSR number | CSR access
+|===
+
+All other encodings for pass:[_]CPC Resource Descriptors with _Address Space_
+set to _FFixedHW_ (0x7f) are reserved for future use.
+
+<<cppc_examples>> provides examples for both a CSR access and an SBI CPPC
+access.
+
+[appendix]
+[#lpi_examples]

@@ -1,0 +1,1 @@
+../../../docs/ffh_lpi_examples.adoc
