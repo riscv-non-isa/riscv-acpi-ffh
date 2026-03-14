@@ -6,5 +6,6 @@ nav:
 
 asciidoc:
   attributes:
-    page-pdf_url: https://github.com/riscv/docs.riscv.org/blob/main/static/pdf/riscv-ffh.pdf
+    page-pdf_url: _attachments/riscv-ffh.pdf
+    more_details_url: https://riscv.atlassian.net/wiki/external/NGVhZDQ2MzY3MzZkNGE1MWIxYTYyMWM5N2Y2NTFjZjA
     page-group: platform-software
