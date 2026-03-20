@@ -26,7 +26,7 @@ REVMARK ?= Draft
 DOCKER_RUN := docker run --rm -v ${PWD}:/build -w /build \
 ghcr.io/riscv/riscv-docs-base-container-image:latest
 
-HEADER_SOURCE := docs/riscv-ffh.adoc
+HEADER_SOURCE := riscv-ffh.adoc
 PDF_RESULT := riscv-ffh.pdf
 
 ASCIIDOCTOR_PDF := asciidoctor-pdf
@@ -36,7 +36,6 @@ OPTIONS := --trace \
            -a revnumber=${VERSION} \
            -a revdate=${DATE} \
            -a revremark=${REVMARK} \
-           -a imagesdir=../images \
            -a pdf-fontsdir=docs-resources/fonts \
            -a pdf-style=docs-resources/themes/riscv-pdf.yml \
            --failure-level=ERROR

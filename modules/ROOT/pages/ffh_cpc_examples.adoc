@@ -1,1 +1,0 @@
-../../../docs/ffh_cpc_examples.adoc
