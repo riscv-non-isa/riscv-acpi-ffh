@@ -11,9 +11,9 @@ RISC-V systems.  Refer to the ACPI specification for all remaining fields.
 ==== Entry Method
 
 The pass:[_]LPI object uses a “Resource Descriptor”, which is formatted per
-<<resource_descriptor_encoding>>, to specify the entry method for a lower
+xref:ffh_introduction.adoc#resource_descriptor_encoding[], to specify the entry method for a lower
 power state.  RISC-V systems set the resource descriptor as specified in
-<<table_lpi_entry_method>>:
+xref:#table_lpi_entry_method[]:
 
 [#table_lpi_entry_method]
 .LPI Entry Method
@@ -27,7 +27,7 @@ power state.  RISC-V systems set the resource descriptor as specified in
 |  _Access Size_                   | 4 (QWord)
 |  _Register Address_              | As specified in the Bits[63:60],
                                      Bits[59:32], and Bits[31:0] columns of
-                                    <<table_lpi_entry_method_address>>
+                                    xref:#table_lpi_entry_method_address[]
 |===
 
 [#table_lpi_entry_method_address]
@@ -52,7 +52,7 @@ _FFixedHW_ (0x7f) are reserved for future use.
 pass:[_]LPI objects also provide an _Arch. Context Lost Flags_ field, which is
 a 32-bit integer, and may be used to indicate what processor context is lost.
 RISC-V pass:[_]LPI objects must have appropriate flags set in this field as
-specified in <<table_lpi_arch_context_lost_flags>>:
+specified in xref:#table_lpi_arch_context_lost_flags[]:
 
 [#table_lpi_arch_context_lost_flags]
 .LPI Arch. Context Lost Flags
@@ -63,7 +63,7 @@ specified in <<table_lpi_arch_context_lost_flags>>:
 | 1          | 31        | Reserved. Must be zero.
 |===
 
-<<lpi_examples>> provides examples for both a WFI entry method and SBI HSM
+xref:#lpi_examples[] provides examples for both a WFI entry method and SBI HSM
 hart suspend entry methods.
 
 === Collaborative Processor Performance Control
@@ -83,9 +83,9 @@ Descriptor” for the _CPC object.
 ==== _CPC Object Resource Descriptor
 
 The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per
-<<resource_descriptor_encoding>>, for many of its fields.  When using an FFH
+xref:ffh_introduction.adoc#resource_descriptor_encoding[], for many of its fields.  When using an FFH
 Resource Descriptor for a _CPC field, it must be formatted as specified in
-<<table_cpc_resource_descriptor>>:
+xref:#table_cpc_resource_descriptor[]:
 
 [#table_cpc_resource_descriptor]
 ._CPC Resource Descriptor
@@ -100,7 +100,7 @@ Resource Descriptor for a _CPC field, it must be formatted as specified in
 | _Register Address_              | As specified in the Bits[63:60],
                                     Bits[59:32], Bits[31:12] and
                                     Bits[11:0] columns of
-                                    <<table_cpc_register_address>>
+                                    xref:#table_cpc_register_address[]
 |===
 
 [#table_cpc_register_address]
@@ -117,7 +117,7 @@ Resource Descriptor for a _CPC field, it must be formatted as specified in
 All other encodings for pass:[_]CPC Resource Descriptors with _Address Space_
 set to _FFixedHW_ (0x7f) are reserved for future use.
 
-<<cppc_examples>> provides examples for both a CSR access and an SBI CPPC
+xref:ffh_lpi_examples.adoc#cppc_examples[] provides examples for both a CSR access and an SBI CPPC
 access.
 
 [appendix]

@@ -12,7 +12,7 @@ RISC-V uses a common top-level encoding whenever possible.  That encoding is:
 
 * The uppermost 4 bits are used to specify the type of identifier represented
   in the remaining bits.  The possible types are described in table
-  <<table_ffh_resource_descriptor_identifier_type>>
+  xref:#table_ffh_resource_descriptor_identifier_type[]
 
 [#table_ffh_resource_descriptor_identifier_type]
 .RISC-V FFH Resource Descriptor Identifier Type
