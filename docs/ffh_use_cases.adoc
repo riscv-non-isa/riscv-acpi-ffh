@@ -11,7 +11,7 @@ RISC-V systems.  Refer to the ACPI specification for all remaining fields.
 ==== Entry Method
 
 The pass:[_]LPI object uses a “Resource Descriptor”, which is formatted per
-xref:ffh_introduction.adoc#resource_descriptor_encoding[], to specify the entry method for a lower
+xref:ffh_introduction.adoc#resource_descriptor_encoding[Chapter 2], to specify the entry method for a lower
 power state.  RISC-V systems set the resource descriptor as specified in
 xref:#table_lpi_entry_method[]:
 
@@ -63,7 +63,7 @@ specified in xref:#table_lpi_arch_context_lost_flags[]:
 | 1          | 31        | Reserved. Must be zero.
 |===
 
-xref:#lpi_examples[] provides examples for both a WFI entry method and SBI HSM
+xref:#lpi_examples[Appemdix A] provides examples for both a WFI entry method and SBI HSM
 hart suspend entry methods.
 
 === Collaborative Processor Performance Control
@@ -83,7 +83,7 @@ Descriptor” for the _CPC object.
 ==== _CPC Object Resource Descriptor
 
 The pass:[_]CPC object may use a “Resource Descriptor”, which is formatted per
-xref:ffh_introduction.adoc#resource_descriptor_encoding[], for many of its fields.  When using an FFH
+xref:ffh_introduction.adoc#resource_descriptor_encoding[Chapter 2], for many of its fields.  When using an FFH
 Resource Descriptor for a _CPC field, it must be formatted as specified in
 xref:#table_cpc_resource_descriptor[]:
 
@@ -117,7 +117,7 @@ xref:#table_cpc_resource_descriptor[]:
 All other encodings for pass:[_]CPC Resource Descriptors with _Address Space_
 set to _FFixedHW_ (0x7f) are reserved for future use.
 
-xref:ffh_lpi_examples.adoc#cppc_examples[] provides examples for both a CSR access and an SBI CPPC
+xref:ffh_lpi_examples.adoc#cppc_examples[Appendix B] provides examples for both a CSR access and an SBI CPPC
 access.
 
 [appendix]
