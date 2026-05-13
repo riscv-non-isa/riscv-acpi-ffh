@@ -1,6 +1,6 @@
 name: acpi-ffh
 title: Functional Fixed Hardware
-version: v1.0.0
+version: v1.0
 nav:
 - modules/ROOT/nav.adoc
 
