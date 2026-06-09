@@ -7,3 +7,4 @@ This RISC-V specification has been contributed to directly or indirectly by:
 * Atish Patra atishp@rivosinc.com
 * Rafael Sene rafael@riscv.org
 * Vasudevan Srinivasan vasu@rivosinc.com
+* Himanshu Chauhan himchau@qti.qualcomm.com
