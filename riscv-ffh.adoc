@@ -81,6 +81,8 @@ addressed by this FFH are as follows:
 
 * Collaborative Processor Performance Control (CPPC), [ACPI 6.5] section 8.4.6
 
+* Error INJection (EINJ), [ACPI 6.5] section 18.6
+
 === Terms and Abbreviations
 
 This specification uses the following terms and abbreviations:
@@ -96,7 +98,9 @@ This specification uses the following terms and abbreviations:
 | FFH   | Functional Fixed Hardware
 | HSM   | Hart State Management
 | LPI   | Low Power Idle
+| MPXY  | SBI Message Proxy Extension
 | OSPM  | Operating System-directed configuration and Power Management
+| RPMI  | RISC-V Platform Management Interface
 | SBI   | Supervisor Binary Interface
 |===
 
@@ -109,8 +113,10 @@ This specification uses the following terms and abbreviations:
 | [ACPI 6.5] | Advanced Configuration and Power Interface Specification
                version 6.5 +
                https://uefi.org/specs/ACPI/6.5/
-| [SBI]      | RISC-V Supervisor Binary Interface Specification version 2.0 +
+| [SBI]      | RISC-V Supervisor Binary Interface Specification version 3.0 +
                https://github.com/riscv-non-isa/riscv-sbi-doc/
+| [RPMI]     | RISC-V Platform Management Interface version 1.0 +
+               https://github.com/riscv-non-isa/riscv-rpmi
 |===
 
 [#resource_descriptor_encoding]
@@ -267,6 +273,60 @@ set to _FFixedHW_ (0x7f) are reserved for future use.
 
 <<cppc_examples>> provides examples for both a CSR access and an SBI CPPC
 access.
+
+=== RAS Error Injection (EINJ)
+
+ACPI describes the Error Injection (EINJ) mechanism to inject hardware errors
+in an abstract and flexible way for the operating system. This is achieved by
+executing simple read/write instructions from EINJ tables. The Generic Address
+Structure (GAS) used to describe EINJ read/write operation can point to an FFH
+address space.
+
+When using an FFH Resource Descriptor for an EINJ GAS entry on RISC-V platform,
+it must be formatted as specified in <<table_einj_resource_descriptor>>:
+
+[#table_einj_resource_descriptor]
+.EINJ Resource Descriptor
+[cols="^1,^2", width=90%, align="center", options="header"]
+|===
+| Field                           | Value
+
+| _Address Space_                 | 0x7F (FFixedHW)
+| _Register Bit Width_            | 64
+| _Register Bit Offset_           | 0
+| _Access Size_                   | 4 (QWord)
+| _Register Address_              | As specified in the Bits[63:60],
+                                    Bits[59:32], and Bits[31:0] columns of
+                                    <<table_einj_register_address>>
+|===
+
+[#table_einj_register_address]
+.EINJ Register Address
+[cols="^1,^1,^1,^1", width=100%, align="center", options="header"]
+|===
+| Bits[63:60] +
+  (Type)
+| Bits[59:32] | Bits[31:0] | Description
+| 0x0   | SBI MPXY Channel ID | REGISTER_ID | Read/write operation on a GAS entry.
+					      The `REGISTER_ID` is as per the <<RPMI>>
+					      RAS Agent service group.
+|===
+
+When the Type in FFH is 0, the following rules apply:
+
+1. The underlying message protocol for the MPXY channel ([SBI] chapter 20) must be
+   RPMI and the underlying RPMI service group must be RAS agent ([RPMI] Section 4.12).
+2. The S-mode software must use the function `sbi_mpxy_send_with_response` for
+   EINJ read/write operations ([ACPI 6.5] section 18.6).
+3. For EINJ read operation, the MPXY Message ID should be RPMI `RAS_EINJ_READ_REG` ([RPMI] Section 4.12)
+   operation and the `REGISTER_ID` required by `RAS_EINJ_READ_REG` is extracted from bits[31:0] of
+   the FFH address.
+4. For EINJ write operation, the MPXY Message ID should be RPMI `RAS_EINJ_WRITE_REG` (RPMI section 4.12)
+   operation and the `REGISTER_ID` required by RPMI `RAS_EINJ_WRITE_REG` is extracted from bits[31:0] of
+   the FFH.
+
+All other encodings for EINJ Resource Descriptors with _Address Space_ set to _FFixedHW_ (0x7f)
+are reserved for future use.
 
 [appendix]
 [#lpi_examples]
