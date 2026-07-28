@@ -28,8 +28,10 @@ ghcr.io/riscv/riscv-docs-base-container-image:latest
 
 HEADER_SOURCE := riscv-ffh.adoc
 PDF_RESULT := riscv-ffh.pdf
+HTML_RESULT := riscv-ffh.html
 
 ASCIIDOCTOR_PDF := asciidoctor-pdf
+ASCIIDOCTOR := asciidoctor
 OPTIONS := --trace \
            -a compress \
            -a mathematical-format=svg \
@@ -39,14 +41,23 @@ OPTIONS := --trace \
            -a pdf-fontsdir=docs-resources/fonts \
            -a pdf-style=docs-resources/themes/riscv-pdf.yml \
            --failure-level=ERROR
+HTML_OPTIONS := --trace \
+                -a mathematical-format=svg \
+                -a revnumber=${VERSION} \
+                -a revdate=${DATE} \
+                -a revremark=${REVMARK} \
+                -a data-uri \
+                -a toc=left \
+                -a sectnums \
+                --failure-level=ERROR
 REQUIRES := --require=asciidoctor-diagram \
             --require=asciidoctor-mathematical
 
-.PHONY: all build clean build-container build-no-container
+.PHONY: all build build-html clean build-container build-no-container build-html-container build-html-no-container
 
-all: build
+all: build build-html
 
-build: 
+build:
 	@echo "Checking if Docker is available..."
 	@if command -v docker &> /dev/null ; then \
 		echo "Docker is available, building inside Docker container..."; \
@@ -66,8 +77,29 @@ build-no-container:
 	$(ASCIIDOCTOR_PDF) $(OPTIONS) $(REQUIRES) --out-file=$(PDF_RESULT) $(HEADER_SOURCE)
 	@echo "Build completed successfully."
 
+build-html:
+	@echo "Checking if Docker is available..."
+	@if command -v docker &> /dev/null ; then \
+		echo "Docker is available, building HTML inside Docker container..."; \
+		$(MAKE) build-html-container; \
+	else \
+		echo "Docker is not available, building HTML without Docker..."; \
+		$(MAKE) build-html-no-container; \
+	fi
+
+build-html-container:
+	@echo "Starting HTML build inside Docker container..."
+	$(DOCKER_RUN) /bin/sh -c "$(ASCIIDOCTOR) $(HTML_OPTIONS) $(REQUIRES) --out-file=$(HTML_RESULT) $(HEADER_SOURCE)"
+	@echo "HTML build completed successfully inside Docker container."
+
+build-html-no-container:
+	@echo "Starting HTML build..."
+	$(ASCIIDOCTOR) $(HTML_OPTIONS) $(REQUIRES) --out-file=$(HTML_RESULT) $(HEADER_SOURCE)
+	@echo "HTML build completed successfully."
+
 clean:
 	@echo "Cleaning up generated files..."
 	rm -f $(PDF_RESULT)
+	rm -f $(HTML_RESULT)
 	@echo "Cleanup completed."
 
